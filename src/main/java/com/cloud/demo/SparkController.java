@@ -1,5 +1,7 @@
 package com.cloud.demo;
 
+import java.util.List;
+
 import org.apache.spark.api.java.JavaRDD;
 
 import org.apache.spark.api.java.function.VoidFunction;
@@ -24,10 +26,16 @@ public class SparkController {
                 
         String str = "";
         //读取元数据文件
-        Dataset<Row> df = spark.read().csv("hdfs://localhost:9000/"+path);
+        //Dataset<Row> df = spark.read().csv("hdfs://localhost:9000/"+path);
+        Dataset<Row> csv = spark.read().format("csv").option("header","true")
+        .load("hdfs://localhost:9000/"+path);
         //生成rdd
-        
-        str = df.toString();
+        List<Row> line = csv.javaRDD().collect();
+        for(Row val:line)
+        {
+            str+=val.get(0)+"\n";
+        }
+        //str = df.toString();
         
         return str;
     }
