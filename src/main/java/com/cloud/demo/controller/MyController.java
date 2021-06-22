@@ -8,6 +8,7 @@ import java.util.Map;
 
 import com.cloud.demo.HDFSController;
 import com.cloud.demo.PigServerController;
+import com.cloud.demo.SparkController;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.pig.PigException;
@@ -50,6 +51,7 @@ public class MyController {
         
         return "pagelook" ;
     }
+    /*
     @GetMapping("/runPigetest/{fname}")
     public String getrunpig(@PathVariable(required = true) String fname,Model model){
     	
@@ -65,7 +67,14 @@ public class MyController {
         
         return "pagelook" ;
     }
-    
+    */
+    @GetMapping("/runSparktest/{fname}")
+    public String getrunSpark(@PathVariable(required = true) String fname,Model model){
+    	SparkController sparkController = new SparkController();
+        model.addAttribute("a", sparkController.run("/hadoop1/"+fname));	
+                
+        return "pagelook" ;
+    }
     @GetMapping("/")
     public String index(){
         return "index";
