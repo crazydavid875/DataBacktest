@@ -34,7 +34,10 @@ public class SparkController {
         List<Row> line = csv.javaRDD().collect();
         for(Row val:line)
         {
-            str+=val.get(0)+"\n";
+            for(int i=0;i<val.size();i++){
+                str+=val.get(i)+",";
+            }
+            str+="\n";
         }
         //str = df.toString();
         
