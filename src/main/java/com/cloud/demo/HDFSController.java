@@ -31,7 +31,7 @@ public class HDFSController {
   
    
     public HDFSController() {
-    	String HDFS_ROOT_URL="hdfs://140.124.184.198:9000";
+    	String HDFS_ROOT_URL="hdfs://localhost:9001";
     	conf = new Configuration();
         conf.set("fs.default.name", HDFS_ROOT_URL);
     
