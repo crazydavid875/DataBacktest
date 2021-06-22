@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" 
+    xmlns:th="http://www.thymeleaf.org" 
+    xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3"
+    xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head lang="en">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+        integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <script type="text/javascript" src="https://code.jquery.com/jquery-3.5.0.js"></script>
+    <script type="text/javascript">
+        var rulecount = 0;
+        $(document).ready(function(){
+            rulecount = 0;
+        });
+        
+        function onListSelect(){
+            $("#removerole").removeAttr("disabled");
+        }
+        function removeRule(that){
+            $(".ruleListele.active.show").remove();
+            
+            if($(".ruleListele.active.show").length==0){
+                $(that).attr("disabled",true);
+            }
+        }
+        function AddRule(){
+            if($(".modal-body select option[value='-1']:selected").length>0 || $(".modal-body input [value='']").length>0) {
+                var clone = $(".alert:hidden").clone();
+                $(".alert:hidden").after(clone);
+                clone.removeAttr("hidden");
+                setTimeout(function() {
+                    clone.alert('close');
+                    setTimeout(function() {
+                        clone.remove();
+                    }, 1000);
+                }, 2000);
+                return;
+            }
+            var item = $(".ruleListele[tmplate]").clone();
+            item.removeAttr("tmplate");
+            item.removeAttr("hidden");
+            var vattr = $(".modal-body #inputAttr option:selected").text();
+            var vop = $(".modal-body #inputOperation option:selected").text();
+            var vvalue = $(".modal-body #inputValue").val();
+            var vact =$(".modal-body #inputAction option:selected").text();
+            var inputAttr = $("<span></span>").text(vattr);
+            var inputOperation = $("<span></span>").text(vop);
+            var inputValue = $("<span></span>").text(vvalue);
+            var inputAction = $("<span></span>").text(vact);
+            var hiddens =  $("<input name='rule"+rulecount+"' type='hidden'/>").val(vattr+","+vop+","+vvalue+","+vact);
+            item.find(".w").after(inputValue);
+            item.find(".w").after(inputOperation);
+            item.find(".w").after(inputAttr);
+            item.find(".t").after(inputAction);
+            item.append(hiddens);
+            rulecount++;
+            $(".ruleList").append(item);
+
+            $(".modal-body select").val('-1');
+            $(".modal-body input").val('');
+        }
+    </script>
+    <style>
+        #content {
+            margin: 0px auto;
+            width: 40em;
+            margin-top: 4em;
+        }
+
+        .card-body form {
+            margin-left: 2em;
+        }
+
+        #rolecollapse {
+            margin-bottom: 1em;
+        }
+
+        #addrole {
+            margin-bottom: 1em;
+        }
+
+        #removerole {
+            margin-top: 1em;
+        }
+
+        #when_form {
+            margin-left: 0.6em;
+        }
+    </style>
+</head>
+
+<body>
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+        integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+        crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+        integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+        crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+        integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+        crossorigin="anonymous"></script>
+    <nav class=" navbar navbar-expand-lg navbar-dark bg-dark">
+        <span class="navbar-brand mb-0 h1">回測網站</span>
+        <div class="collapse navbar-collapse" id="navbarText">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item active">
+                    <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Features</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Pricing</a>
+                </li>
+            </ul>
+
+        </div>
+    </nav>
+    <div class="card" id="content">
+        <h5 class="card-header">Setting</h5>
+
+        <div class="card-body ">
+            <form method="POST" action="/rule"  enctype="application/x-www-form-urlencoded" >
+                <div class="form-group row">
+                    <label for="moneytype" class="col-sm-2 col-form-label col-form-label-lg">貨幣</label>
+                    <div class="col-sm-8">
+                        <select name="moneytype" id="moneytype" class="form-control">
+                            <option value="-1" selected>Choose...</option>
+                            <option value="0">比特幣</option>
+                        </select>
+                    </div>
+                </div>
+                <p>
+                    <a class="btn btn-secondary btn-outline-dark" data-toggle="collapse" href="#rolecollapse"
+                        role="button" aria-expanded="false" aria-controls="collapseExample">
+                        Rules
+                    </a>
+                </p>
+                <div class="collapse" id="rolecollapse">
+                    <div class="alert alert-danger alert-dismissible fade show" hidden>
+                        <strong>Error!</strong> 新增失敗
+                        <button type="button" class="close" data-dismiss="alert">&times;</button>
+                    </div>
+                    <div class="card card-body">
+                        <button id="addrole" type="button" class="btn btn-success" data-toggle="modal"
+                            data-target="#exampleModalCenter">Add rule</button>
+                        <div class="list-group ruleList" id="list-tab" role="tablist">
+                            <a class="list-group-item list-group-item-action ruleListele" id="list-home-list" data-toggle="list"
+                                href="#list-home" role="tab" aria-controls="home" onclick="onListSelect()" hidden tmplate>
+                                <strong class="w">When&nbsp;</strong>
+                                <strong class="t">&nbsp;&nbsp;Then&nbsp;  </strong></a>
+                            
+                        </div>
+                        <button id="removerole" type="button" class="btn btn-outline-danger" onclick="removeRule(this)" disabled >Remove</button>
+                    </div>
+                </div>
+                <input type="hidden" name="rule0" value="date,==,2,Sale"/>
+                <input type="hidden" name="rule1" value="date,==,2,Sale"/>
+                <button type="submit" class="btn btn-primary"  value="submit">Submit</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog"
+        aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLongTitle">Add New Rule</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <h6>When</h6>
+                    <hr>
+                    <div class="form-row" id="when_form">
+                        <div class="form-group col-md-4">
+                            <label for="inputAttr">Attribute</label>
+                            <select id="inputAttr" class="form-control">
+                                <option value="-1" selected>Choose...</option>
+                                <option value="0" >date</option>
+                                <option value="1" >cost</option>
+                            </select>
+                        </div>
+                        <div class="form-group col-md-3 ">
+                            <label for="inputOperation">Operation</label>
+                            <select id="inputOperation" class="form-control">
+                                <option value="-1" selected>...</option>
+                                <option value="0"  >==</option>
+                                <option value="1" >>=</option>
+                                <option value="2" ><=</option>
+                                <option value="3" >!=</option>
+                                <option value="4" >></option>
+                                <option value="5" ><</option>
+                            </select>
+                        </div>
+                        <div class="form-group col-md-4">
+                            <label for="inputValue">Value</label>
+                            <input type="text" class="form-control" id="inputValue">
+                        </div>
+                    </div>
+                    <h6>Then</h6>
+                    <hr>
+                    <div class="form-group col-md-5">
+                        <label for="inputAction">Action</label>
+                        <select id="inputAction" class="form-control">
+                            <option value="-1" selected>Choose...</option>
+                            <option value="0" >Sale</option>
+                            <option value="1" >Buy</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary"  data-dismiss="modal"  onclick="AddRule()">Add</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+</body>
+</html>
