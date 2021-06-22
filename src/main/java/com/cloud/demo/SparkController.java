@@ -15,7 +15,7 @@ public class SparkController {
     //"hdfs://localhost:9000/hadoop1/stock2330.csv"
     private static SparkSession spark;
     public SparkController() {
-    	 SparkSession spark = SparkSession
+    	spark = SparkSession
                  .builder()
                  .appName(appName)
                  .master(master)
@@ -25,10 +25,11 @@ public class SparkController {
        
                 
         String str = "";
+        String loc = "hdfs://localhost:9001/"+path;
         //读取元数据文件
         //Dataset<Row> df = spark.read().csv("hdfs://localhost:9000/"+path);
         Dataset<Row> csv = spark.read().format("csv").option("header","true")
-        .load("hdfs://localhost:9001/"+path);
+        .load(loc);
         //生成rdd
         List<Row> line = csv.javaRDD().collect();
         for(Row val:line)
