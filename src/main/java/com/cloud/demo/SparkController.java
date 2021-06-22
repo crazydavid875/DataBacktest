@@ -28,7 +28,7 @@ public class SparkController {
         //读取元数据文件
         //Dataset<Row> df = spark.read().csv("hdfs://localhost:9000/"+path);
         Dataset<Row> csv = spark.read().format("csv").option("header","true")
-        .load("hdfs://localhost:9000/"+path);
+        .load("hdfs://140.124.184.198:9000/"+path);
         //生成rdd
         List<Row> line = csv.javaRDD().collect();
         for(Row val:line)
