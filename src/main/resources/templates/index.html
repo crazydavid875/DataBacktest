@@ -90,7 +90,7 @@
                 }
             });
             $("#adata").hide();
-            var url = "http://204adc7ceaaa.ngrok.io";
+            var url = "http://d12627e98fc3.ngrok.io";
             var item = {"coin": $("#moneytype option:selected").val(),
                     "time": parseInt($("#datetype option:selected").val()),
                     "buyLimit":buylim,  
@@ -114,8 +114,15 @@
                     $("#adata").show();
                     $("#strrate").text(data.StrategyRate);
                     $("#diffrate").text(data.diffRate);
-                    $("#plimg").attr("src",url+"");
                     $("#plimg").show();
+                    //$("#plimg").attr("src",url);
+                    $.ajax({
+                    url: url+"/pic",
+                    type: "GET",
+                    success: function (data) {
+                        $("#plimg").attr("src","data:image/png;base64, "+data);
+                    }
+                    });
                 }
             });
         }
@@ -415,9 +422,9 @@
                         </svg>
                         
                     </div>
-                    <div class="container2">
-                        <img id="plimg" src="/"></img>
-                    </div>
+                    
+                    <img id="plimg" src="/" width="400px" height="200px" ></img>
+                    
                     
                 </div>
                 <div class="modal-footer">
