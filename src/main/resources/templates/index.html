@@ -10,11 +10,12 @@
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
         integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-    <script type="text/javascript" src="https://code.jquery.com/jquery-3.5.0.js"></script>
+    <script type="text/javascript" src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script type="text/javascript">
         var rulecount = 0;
         $(document).ready(function(){
             rulecount = 0;
+            $("#plimg").hide();
         });
         
         function onListSelect(){
@@ -28,7 +29,7 @@
             }
         }
         function AddRule(){
-            if($(".modal-body select option[value='-1']:selected").length>0 || $(".modal-body input [value='']").length>0) {
+            if($(".modal-body select option[value='-1']:selected").length>0 ) {
                 var clone = $(".alert:hidden").clone();
                 $(".alert:hidden").after(clone);
                 clone.removeAttr("hidden");
@@ -43,16 +44,17 @@
             var item = $(".ruleListele[tmplate]").clone();
             item.removeAttr("tmplate");
             item.removeAttr("hidden");
-            var vattr = $(".modal-body #inputAttr option:selected").text();
-            var vop = $(".modal-body #inputOperation option:selected").text();
-            var vvalue = $(".modal-body #inputValue").val();
-            var vact =$(".modal-body #inputAction option:selected").text();
-            var inputAttr = $("<span></span>").text(vattr);
-            var inputOperation = $("<span></span>").text(vop);
-            var inputValue = $("<span></span>").text(vvalue);
-            var inputAction = $("<span></span>").text(vact);
-            var hiddens =  $("<input name='rule"+rulecount+"' type='hidden'/>").val(vattr+","+vop+","+vvalue+","+vact);
+            var vattr = $(".modal-body #inputAttr option:selected");
+            var vop = $(".modal-body #inputOperation option:selected");
+            var vvalue = $(".modal-body #inputValue option:selected");
+            var vact =$(".modal-body #inputAction option:selected");
+            var inputAttr = $("<span></span>").text(vattr.text());
+            var inputOperation = $("<span></span>").text(vop.text());
+            var inputValue = $("<span></span>").text(vvalue.text());
+            var inputAction = $("<span></span>").text(vact.text());
+            var hiddens =  $("<input name='rule"+rulecount+"' type='hidden'/>").val(vattr.val()+","+vop.val()+","+vvalue.val()+","+vact.val());
             item.find(".w").after(inputValue);
+            
             item.find(".w").after(inputOperation);
             item.find(".w").after(inputAttr);
             item.find(".t").after(inputAction);
@@ -62,6 +64,60 @@
 
             $(".modal-body select").val('-1');
             $(".modal-body input").val('');
+        }
+        function submitAjax(){
+            var selltype = [];
+            var buytype = [];
+            var selllim = [];
+            var buylim = [];
+            
+            $("input[name^='rule']").each(function(i){
+                var v = $(this).val().split(",");
+                var limt = 0;
+                if(v[0]==0){
+                    limt =  parseInt(v[2]);
+                }
+                else{
+                    limt = 5;
+                }
+                if(v[3]==0){
+                    buytype.push( parseInt(v[1]));
+                    buylim.push( parseInt(limt));
+                }
+                if(v[3]==1){
+                    selltype.push( parseInt(v[1]));
+                    selllim.push( parseInt(limt));
+                }
+            });
+            $("#adata").hide();
+            var url = "http://204adc7ceaaa.ngrok.io";
+            var item = {"coin": $("#moneytype option:selected").val(),
+                    "time": parseInt($("#datetype option:selected").val()),
+                    "buyLimit":buylim,  
+                    "buyType":buytype,      
+                    "sellLimit":selllim,
+                    "sellType":selltype 
+                };
+                $("#plimg").hide();
+                $(".container2").show();
+                $.ajax({
+                url: url+"/getEarn",
+                type: "POST",
+                data: JSON.stringify(item),
+                headers: "",
+                dataType: 'json',
+                contentType:'application/json; charset=utf-8',
+                success: function (data) {
+                    $(".container2").hide();
+                    //JSON.stringify(data, null, 4) ;
+                    
+                    $("#adata").show();
+                    $("#strrate").text(data.StrategyRate);
+                    $("#diffrate").text(data.diffRate);
+                    $("#plimg").attr("src",url+"");
+                    $("#plimg").show();
+                }
+            });
         }
     </script>
     <style>
@@ -90,13 +146,91 @@
         #when_form {
             margin-left: 0.6em;
         }
+        .container2 {
+            display: -webkit-box;
+            display: -ms-flexbox;
+            display: flex;
+            -webkit-box-align: center;
+                -ms-flex-align: center;
+                    align-items: center;
+            -webkit-box-pack: center;
+                -ms-flex-pack: center;
+                    justify-content: center;
+            min-height: 10vh;
+        }
+
+    .loader {
+    max-width: 15rem;
+    width: 100%;
+    height: auto;
+    stroke-linecap: round;
+    }
+
+    circle {
+    fill: none;
+    stroke-width: 3.5;
+    -webkit-animation-name: preloader;
+            animation-name: preloader;
+    -webkit-animation-duration: 3s;
+            animation-duration: 3s;
+    -webkit-animation-iteration-count: infinite;
+            animation-iteration-count: infinite;
+    -webkit-animation-timing-function: ease-in-out;
+            animation-timing-function: ease-in-out;
+    -webkit-transform-origin: 170px 170px;
+            transform-origin: 170px 170px;
+    will-change: transform;
+    }
+    circle:nth-of-type(1) {
+    stroke-dasharray: 550;
+    }
+    circle:nth-of-type(2) {
+    stroke-dasharray: 500;
+    }
+    circle:nth-of-type(3) {
+    stroke-dasharray: 450;
+    }
+    circle:nth-of-type(4) {
+    stroke-dasharray: 300;
+    }
+    circle:nth-of-type(1) {
+    -webkit-animation-delay: -0.15s;
+            animation-delay: -0.15s;
+    }
+    circle:nth-of-type(2) {
+    -webkit-animation-delay: -0.3s;
+            animation-delay: -0.3s;
+    }
+    circle:nth-of-type(3) {
+    -webkit-animation-delay: -0.45s;
+    -moz-animation-delay:  -0.45s;
+            animation-delay: -0.45s;
+    }
+    circle:nth-of-type(4) {
+    -webkit-animation-delay: -0.6s;
+    -moz-animation-delay: -0.6s;
+            animation-delay: -0.6s;
+    }
+
+    @-webkit-keyframes preloader {
+    50% {
+        -webkit-transform: rotate(360deg);
+                transform: rotate(360deg);
+    }
+    }
+
+    @keyframes preloader {
+    50% {
+        -webkit-transform: rotate(360deg);
+                transform: rotate(360deg);
+    }
+    }
+
     </style>
 </head>
 
 <body>
-    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
-        integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
-        crossorigin="anonymous"></script>
+    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
         integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
         crossorigin="anonymous"></script>
@@ -126,11 +260,25 @@
         <div class="card-body ">
             <form method="POST" action="/rule"  enctype="application/x-www-form-urlencoded" >
                 <div class="form-group row">
-                    <label for="moneytype" class="col-sm-2 col-form-label col-form-label-lg">貨幣</label>
+                    <label for="moneytype" class="col-sm-3 col-form-label col-form-label-lg">貨幣</label>
                     <div class="col-sm-8">
                         <select name="moneytype" id="moneytype" class="form-control">
                             <option value="-1" selected>Choose...</option>
-                            <option value="0">比特幣</option>
+                            <option value="btc">比特幣</option>
+                            <option value="etc">乙太幣</option>
+                            <option value="doge">Dogg幣</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label for="datetype" class="col-sm-3 col-form-label col-form-label-lg">時間長度</label>
+                    <div class="col-sm-8">
+                        <select name="datetype" id="datetype" class="form-control">
+                            <option value="-1" selected>Choose...</option>
+                            <option value="3">3個月</option>
+                            <option value="6">6個月</option>
+                            <option value="12">12個月</option>
+                            <option value="0">All</option>
                         </select>
                     </div>
                 </div>
@@ -158,9 +306,9 @@
                         <button id="removerole" type="button" class="btn btn-outline-danger" onclick="removeRule(this)" disabled >Remove</button>
                     </div>
                 </div>
-                <input type="hidden" name="rule0" value="date,==,2,Sale"/>
-                <input type="hidden" name="rule1" value="date,==,2,Sale"/>
-                <button type="submit" class="btn btn-primary"  value="submit">Submit</button>
+                
+                <button type="button" data-toggle="modal"
+                data-target="#ajaxModalCenter" onclick="submitAjax()"  class="btn btn-primary"  value="submit">Submit</button>
             </form>
         </div>
     </div>
@@ -180,29 +328,46 @@
                     <h6>When</h6>
                     <hr>
                     <div class="form-row" id="when_form">
-                        <div class="form-group col-md-4">
+                        <!-- <div class="form-group col-md-4">
                             <label for="inputAttr">Attribute</label>
                             <select id="inputAttr" class="form-control">
                                 <option value="-1" selected>Choose...</option>
-                                <option value="0" >date</option>
+                                <option value="0" >本金</option>
                                 <option value="1" >cost</option>
-                            </select>
+                            </select> 
+                        </div> -->
+                        <div class="form-group col-md-4">
+                                <label for="inputAttr">Attribute</label>
+                                <select id="inputAttr" class="form-control">
+                                    <option value="-1" selected>Choose...</option>
+                                    <option value="0" >本金</option>
+                                    <option value="1" >5min</option>
+                                </select> 
+                            
                         </div>
                         <div class="form-group col-md-3 ">
                             <label for="inputOperation">Operation</label>
                             <select id="inputOperation" class="form-control">
                                 <option value="-1" selected>...</option>
-                                <option value="0"  >==</option>
-                                <option value="1" >>=</option>
-                                <option value="2" ><=</option>
-                                <option value="3" >!=</option>
-                                <option value="4" >></option>
-                                <option value="5" ><</option>
+                                <option value="0"  ><</option>
+                                <option value="1" >></option>
                             </select>
-                        </div>
-                        <div class="form-group col-md-4">
-                            <label for="inputValue">Value</label>
+                        </div><!-- <label for="inputValue">Value</label>
                             <input type="text" class="form-control" id="inputValue">
+                            -->
+                        <div class="form-group col-md-4">
+                            
+                            
+                                <label for="inputValue">Attribute</label>
+                                <select id="inputValue" class="form-control">
+                                    <option value="-1" selected>Choose...</option>
+                                    <option value="0" >5min</option>
+                                    <option value="1" >10min</option>
+                                    <option value="2" >30min</option>
+                                    <option value="3" >1hr</option>
+                                    <option value="4" >3hr</option>
+                                </select> 
+                            
                         </div>
                     </div>
                     <h6>Then</h6>
@@ -211,8 +376,8 @@
                         <label for="inputAction">Action</label>
                         <select id="inputAction" class="form-control">
                             <option value="-1" selected>Choose...</option>
-                            <option value="0" >Sale</option>
-                            <option value="1" >Buy</option>
+                            <option value="0" >Buy</option>
+                            <option value="1" >Sale</option>
                         </select>
                     </div>
                 </div>
@@ -223,6 +388,44 @@
             </div>
         </div>
     </div>
-    
+    <!-- Response Modal -->
+    <div class="modal fade" id="ajaxModalCenter" tabindex="-1" role="dialog"
+        aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLongTitle">Result</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div id="adata">
+                        <p>StrategyRate：<span id="strrate"></span></p> 
+                        <p>DifferenceRate：<span id="diffrate"></span></p> 
+                    </div>
+                    <div class="container2">
+	
+                        <svg class="loader" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 340 340">
+                             <circle cx="170" cy="170" r="160" stroke="#E2007C"/>
+                             <circle cx="170" cy="170" r="135" stroke="#404041"/>
+                             <circle cx="170" cy="170" r="110" stroke="#E2007C"/>
+                             <circle cx="170" cy="170" r="85" stroke="#404041"/>
+                        </svg>
+                        
+                    </div>
+                    <div class="container2">
+                        <img id="plimg" src="/"></img>
+                    </div>
+                    
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    
+                </div>
+            </div>
+        </div>
+    </div>
 </body>
 </html>

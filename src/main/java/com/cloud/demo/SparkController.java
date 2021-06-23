@@ -2,9 +2,7 @@ package com.cloud.demo;
 
 import java.util.List;
 
-import org.apache.spark.api.java.JavaRDD;
 
-import org.apache.spark.api.java.function.VoidFunction;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
@@ -22,7 +20,7 @@ public class SparkController {
                  .getOrCreate();
     }
     public String run(String path){
-       
+        
                 
         String str = "";
         String loc = "hdfs://localhost:9001/"+path;
